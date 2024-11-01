@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAG Service Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="script.js" defer></script>
+    <style>
+        #collectionSelect {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .custom-select {
+            position: relative;
+            display: inline-block;
+            min-width: 120px;
+        }
+        .custom-select select {
+            display: block;
+            width: 100%;
+            padding-right: 30px;
+        }
+        .select-selected {
+            background-color: transparent;
+        }
+        .select-selected:after {
+            position: absolute;
+            content: "";
+            top: 14px;
+            right: 10px;
+            width: 0;
+            height: 0;
+            border: 6px solid transparent;
+            border-color: #000 transparent transparent transparent;
+        }
+        .select-items {
+            position: absolute;
+            background-color: white;
+            top: 100%;
+            left: 0;
+            right: 0;
+            z-index: 99;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.375rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .select-hide {
+            display: none;
+        }
+        .select-items div {
+            padding: 8px 16px;
+            cursor: pointer;
+            user-select: none;
+        }
+        .select-items div:hover, .same-as-selected {
+            background-color: #f3f4f6;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex">
+    <!-- Sidebar -->
+    <aside class="bg-gray-800 text-white w-64 min-h-screen p-4">
+        <h1 class="text-2xl font-bold mb-6">RAG Service</h1>
+        <nav>
+            <ul class="space-y-2">
+                <li>
+                    <a href="#" class="block py-2 px-4 rounded hover:bg-gray-700 transition" onclick="showSection('query')" id="queryLink">
+                        <i class="fas fa-search mr-2"></i> Query
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="block py-2 px-4 rounded hover:bg-gray-700 transition" onclick="showSection('documents')" id="documentsLink">
+                        <i class="fas fa-file-alt mr-2"></i> Documents
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="block py-2 px-4 rounded hover:bg-gray-700 transition" onclick="showSection('collections')" id="collectionsLink">
+                        <i class="fas fa-folder mr-2"></i> Collections
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-8">
+        <div id="querySection" class="hidden">
+            <h2 class="text-2xl font-bold mb-4">Query</h2>
+            <form id="queryForm" class="max-w-lg mx-auto">
+                <div class="flex">
+                    <label for="queryCollectionSelect" class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Select Collection</label>
+                    <button id="dropdown-button" data-dropdown-toggle="dropdown" class="flex-shrink-0 z-10 inline-flex items-center py-2.5 px-4 text-sm font-medium text-center text-gray-900 bg-gray-100 border border-gray-300 rounded-s-lg hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:ring-gray-700 dark:text-white dark:border-gray-600" type="button">
+                        All collections 
+                        <svg class="w-2.5 h-2.5 ms-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
+                        </svg>
+                    </button>
+                    <div id="dropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
+                        <ul id="queryCollectionSelect" class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdown-button">
+                            <li>
+                                <button type="button" class="inline-flex w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Default</button>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="relative w-full">
+                        <input type="search" id="queryInput" name="query" class="block p-2.5 w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-e-lg border-s-gray-50 border-s-2 border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-s-gray-700  dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter your query" required />
+                        <button type="submit" class="absolute top-0 end-0 p-2.5 text-sm font-medium h-full text-white bg-blue-700 rounded-e-lg border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                            <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+                            </svg>
+                            <span class="sr-only">Search</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+            <div id="queryResults" class="mt-8">
+                <h3 class="text-xl font-semibold mb-4">Results</h3>
+                <table class="min-w-full bg-white shadow rounded-lg">
+                    <thead>
+                        <tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
+                            <th class="py-3 px-6 text-left">Chunk</th>
+                            <th class="py-3 px-6 text-left">Distance</th>
+                            <th class="py-3 px-6 text-left">Document</th>
+                        </tr>
+                    </thead>
+                    <tbody id="queryResultsList"></tbody>
+                </table>
+            </div>
+        </div>
+        <div id="collectionsSection" class="hidden">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold">Collections</h2>
+                <button onclick="showNewCollectionPopup()" class="bg-gray-800 text-white py-2 px-4 rounded-full hover:bg-gray-700 transition">
+                    <i class="fas fa-plus mr-2"></i> New Collection
+                </button>
+            </div>
+            <ul id="collectionsList" class="bg-white shadow rounded-lg divide-y"></ul>
+            <p id="noCollectionsMessage" class="text-gray-600 mt-4 hidden">No collections found.</p>
+        </div>
+
+        <!-- New Collection Popup -->
+        <div id="newCollectionPopup" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+            <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+                <div class="mt-3 text-center">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">Create New Collection</h3>
+                    <div class="mt-2 px-7 py-3">
+                        <input id="newCollectionName" type="text" class="px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1" placeholder="Collection Name">
+                    </div>
+                    <div class="items-center px-4 py-3">
+                        <button id="createCollectionBtn" class="px-4 py-2 bg-gray-800 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                            Create
+                        </button>
+                    </div>
+                    <div class="items-center px-4 py-3">
+                        <button onclick="hideNewCollectionPopup()" class="px-4 py-2 bg-white text-gray-800 text-base font-medium rounded-md w-full shadow-sm border border-gray-300 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="documentsSection" class="hidden">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold">Documents</h2>
+                <button onclick="showUploadForm()" class="bg-gray-800 text-white py-2 px-4 rounded-full hover:bg-gray-700 transition">
+                    <i class="fas fa-plus mr-2"></i> Upload
+                </button>
+            </div>
+            <input type="text" id="searchInput" placeholder="Search documents..." class="mb-4 p-2 border rounded-md w-full">
+            <div class="overflow-x-auto">
+                <table id="documentsTable" class="min-w-full bg-white shadow rounded-lg">
+                    <thead>
+                        <tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
+                            <th class="py-3 px-6 text-left">Filename</th>
+                            <th class="py-3 px-6 text-left">Collection</th>
+                            <th class="py-3 px-6 text-left">Chunks</th>
+                            <th class="py-3 px-6 text-left">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="documentsList"></tbody>
+                </table>
+            </div>
+            <p id="noDocumentsMessage" class="text-gray-600 mt-4 hidden">No documents found.</p>
+        </div>
+
+        <!-- Upload Form (Initially Hidden) -->
+        <div id="uploadFormSection" class="hidden bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-2xl font-bold mb-4">Upload Document</h2>
+            <form id="uploadForm" class="space-y-4">
+                <div>
+                    <label for="collectionSelect" class="block text-sm font-medium text-gray-700">Collection</label>
+                    <div class="mt-1 relative custom-select">
+                        <select id="collectionSelect" required>
+                            <option value="">Select a collection</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="dropArea" class="border-2 border-dashed border-gray-300 rounded-md p-6 text-center cursor-pointer hover:border-indigo-500 transition-colors duration-300">
+                    <input type="file" id="pdfFile" accept=".pdf" required class="hidden">
+                    <p class="text-gray-600">Drag and drop your PDF here or click to select</p>
+                    <p id="selectedFileName" class="mt-2 text-sm text-gray-500"></p>
+                </div>
+                <div class="flex justify-between">
+                    <button type="button" onclick="cancelUpload()" class="bg-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition">
+                        Cancel
+                    </button>
+                    <button type="submit" class="bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition">
+                        Upload
+                    </button>
+                </div>
+            </form>
+            <div id="status" class="mt-4 py-2 px-4 rounded-md hidden">
+                <p id="statusText" class="text-center text-sm"></p>
+            </div>
+            <div id="uploadSpinner" class="hidden mt-4 flex justify-center">
+                <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div>
+            </div>
+        </div>
+
+        <!-- Document Chunks View -->
+        <div id="documentChunksSection" class="hidden">
+            <div class="flex items-center mb-6">
+                <button onclick="showSection('documents')" class="mr-4 text-gray-600 hover:text-gray-800">
+                    <i class="fas fa-arrow-left"></i> Back to Documents
+                </button>
+                <h2 class="text-xl font-bold py-2" id="chunksDocumentTitle"></h2>
+            </div>
+            <p class="text-lg text-gray-700 mb-4" id="chunksDocumentFilename"></p>
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white shadow rounded-lg">
+                    <thead>
+                        <tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
+                            <th class="py-3 px-6 text-left">Chunk Number</th>
+                            <th class="py-3 px-6 text-left">Chunk Start</th>
+                            <th class="py-3 px-6 text-left">Chunk End</th>
+                            <th class="py-3 px-6 text-left">Embedding Preview</th>
+                        </tr>
+                    </thead>
+                    <tbody id="documentChunksList"></tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

@@ -1,0 +1,150 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.env
+.venv
+.python-version
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.vim/
+*.sublime-workspace
+*.sublime-project
+.project
+.pydevproject
+.settings/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Docker
+.docker/
+docker-compose.override.yml
+
+# Service-specific
+uploads/
+vectors/
+*.pdf
+temp/
+cache/
+
+# System
+.DS_Store
+Thumbs.db
+*.bak
+*.tmp
+*.temp
+
+# Database
+*.sqlite
+*.sqlite3
+*.db
+pgdata/
+
+# Build artifacts
+.build/
+*.pyc
+*.pyo
+*.pyd
+*.so
+*.dll
+*.dylib
+
+# Local development
+local_settings.py
+settings_local.py
+*.local
+
+# Security/Secrets
+*.pem
+*.key
+*.cert
+*.crt
+*.p12
+secrets/
+credentials/
+.secrets
+
+# Documentation
+/site
+docs/_build/
+
+# Temporary files
+tmp/
+temp/
+.temp/
+*.swp
+*~
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Distribution
+dist/
+build/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Environments
+.env.*
+!.env.example
+
+# Profiling
+*.prof
+prof/
+
+# Backup files
+*.bak
+*.backup
+*~
+*.old
+.aider*
