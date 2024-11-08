@@ -66,7 +66,10 @@ async function performQuery(query, collection) {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ query, collection }),
+            body: JSON.stringify({ 
+                query: query,
+                collection: collection || 'Default'
+            }),
         });
 
         if (!response.ok) {
