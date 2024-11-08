@@ -22,7 +22,7 @@ function showSection(sectionName, documentId = null) {
         document.getElementById('documentsLink').classList.add('bg-blue-100');
         fetchDocuments();
     } else if (sectionName === 'documentChunks' && documentId) {
-        document.getElementById('documentsLink').classList.add('bg-gray-700');
+        document.getElementById('documentsLink').classList.add('bg-blue-100');
         fetchDocumentChunks(documentId);
     }
 
