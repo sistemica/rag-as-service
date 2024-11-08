@@ -8,7 +8,7 @@ A robust Retrieval-Augmented Generation service that processes PDF documents and
 - **Text Content Upload**: Direct text content upload via API endpoint
 - **Multiple Embedding Providers**: Support for both Ollama and OpenAI embeddings
 - **Vector Search**: Efficient semantic search using pgvector
-- **Multi-User Support**: Built-in user isolation for document management
+- **Collections Support**: Organize documents into collections for better management
 - **Robust Error Handling**: Comprehensive error handling and logging
 - **Docker Support**: Full containerization with health checks
 - **API Documentation**: Auto-generated API documentation with FastAPI
@@ -89,83 +89,17 @@ make lint
 
 ### Environment Variables
 
-|
- Variable 
-|
- Description 
-|
- Default 
-|
-|
-----------
-|
--------------
-|
----------
-|
-|
- EMBEDDING_PROVIDER 
-|
- Choose 'ollama' or 'openai' 
-|
- ollama 
-|
-|
- EMBEDDING_MODEL 
-|
- Model name for embeddings 
-|
- nomic-embed-text 
-|
-|
- EMBEDDING_DIMENSION 
-|
- Vector dimension 
-|
- 768 
-|
-|
- POSTGRES_USER 
-|
- Database user 
-|
- raguser 
-|
-|
- POSTGRES_PASSWORD 
-|
- Database password 
-|
- ragpass 
-|
-|
- POSTGRES_DB 
-|
- Database name 
-|
- ragdb 
-|
-|
- OLLAMA_BASE_URL 
-|
- Ollama API URL 
-|
- http://ollama:11434 
-|
-|
- OPENAI_API_KEY 
-|
- OpenAI API key 
-|
- None 
-|
-|
- LOG_LEVEL 
-|
- Logging level 
-|
- INFO 
-|
+| Variable | Description | Default |
+|----------|-------------|----------|
+| EMBEDDING_PROVIDER | Choose 'ollama' or 'openai' | ollama |
+| EMBEDDING_MODEL | Model name for embeddings | nomic-embed-text |
+| EMBEDDING_DIMENSION | Vector dimension | 768 |
+| POSTGRES_USER | Database user | raguser |
+| POSTGRES_PASSWORD | Database password | ragpass |
+| POSTGRES_DB | Database name | ragdb |
+| OLLAMA_BASE_URL | Ollama API URL | http://ollama:11434 |
+| OPENAI_API_KEY | OpenAI API key | None |
+| LOG_LEVEL | Logging level | INFO |
 
 ## 📚 API Documentation
 
