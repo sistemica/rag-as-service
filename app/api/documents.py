@@ -19,11 +19,14 @@ async def query_documents(
     db: AsyncSession = Depends(get_db)
 ):
     try:
-        query_text = query.get("query")
+        query_text = query.get("query").strip().lower()
         collection_name = query.get("collection", "Default")
 
         if not query_text:
             raise HTTPException(status_code=400, detail="Query text is required")
+
+        # Log the search query for debugging
+        logger.debug(f"Searching for: '{query_text}' in collection: {collection_name}")
 
         # Get the embedding for the query
         query_embedding = await get_embeddings([query_text])
@@ -45,7 +48,10 @@ async def query_documents(
             )
             .join(Document)
             .join(Collection)
-            .where(Collection.name == collection_name)
+            .where(
+                Collection.name == collection_name,
+                func.lower(chunk_table.content).contains(func.lower(query_text))
+            )
             .order_by("distance")
             .limit(5)
         )
