@@ -739,10 +739,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            // Hide the form elements and show spinner
-            document.getElementById('dropArea').classList.add('hidden');
-            document.getElementById('status').classList.remove('hidden');
-            uploadSpinner.classList.remove('hidden');
+            // Hide upload area and show status area
+            document.getElementById('uploadArea').classList.add('hidden');
+            document.getElementById('uploadStatus').classList.remove('hidden');
             document.querySelector('#uploadForm button[type="submit"]').disabled = true;
 
             const formData = new FormData();
@@ -764,8 +763,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     form.reset();
                     selectedFileName.textContent = '';
                     // Reset the form view
-                    document.getElementById('dropArea').classList.remove('hidden');
-                    uploadSpinner.classList.add('hidden');
+                    document.getElementById('uploadArea').classList.remove('hidden');
+                    document.getElementById('uploadStatus').classList.add('hidden');
                     document.querySelector('#uploadForm button[type="submit"]').disabled = false;
                     // Refresh the documents list and switch to documents view
                     fetchDocuments();
