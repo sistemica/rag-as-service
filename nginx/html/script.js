@@ -379,7 +379,7 @@ async function deleteCollection(collectionName) {
             console.error('Error deleting collection:', error);
             showStatus('Error deleting collection. Please try again.', true);
         }
-    }
+    });
 }
 
 async function updateCounts() {
@@ -465,7 +465,7 @@ async function deleteDocument(documentId, filename) {
             console.error('Error deleting document:', error);
             showStatus('Error deleting document. Please try again.', true);
         }
-    }
+    });
 }
 
 function searchDocuments() {
