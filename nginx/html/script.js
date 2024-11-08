@@ -230,16 +230,23 @@ function cancelUpload() {
 async function fetchCollections() {
     try {
         console.log('Fetching collections...');
-        const collectionsResponse = await fetch('/api/collections');
+        const response = await fetch('/api/collections');
         await updateCounts(); // Update the counts after fetching collections
-        console.log('Collections response:', collectionsResponse);
+        console.log('Collections response:', response);
         
-        if (!collectionsResponse.ok) {
-            throw new Error(`HTTP error! status: ${collectionsResponse.status}`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
         
-        const collections = await collectionsResponse.json();
+        const collections = await response.json();
         console.log('Collections data:', collections);
+
+        // Add function to handle checkbox toggling
+        window.toggleCollectionCheckbox = function(element) {
+            const checkbox = element.querySelector('.collection-checkbox');
+            checkbox.checked = !checkbox.checked;
+            checkbox.dispatchEvent(new Event('click', { bubbles: true }));
+        };
 
         // Fetch documents
         const documentsResponse = await fetch('/api/documents');
