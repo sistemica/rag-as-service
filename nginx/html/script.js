@@ -74,7 +74,9 @@ async function performQuery(query, collection) {
         }
 
         const results = await response.json();
+        const queryResults = document.getElementById('queryResults');
         const queryResultsList = document.getElementById('queryResultsList');
+        queryResults.classList.remove('hidden');
         queryResultsList.innerHTML = results.map(result => `
             <tr class="border-b border-gray-200 hover:bg-gray-100 cursor-pointer" onclick="toggleChunk(this)">
                 <td class="py-3 px-6 text-left">${result.chunk_number}</td>
