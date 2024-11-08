@@ -647,11 +647,11 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         dropArea.classList.remove('border-indigo-500');
         const file = e.dataTransfer.files[0];
-        if (file && file.type === 'application/pdf') {
+        if (file && (file.type === 'application/pdf' || file.type === 'text/plain')) {
             fileInput.files = e.dataTransfer.files;
             selectedFileName.textContent = file.name;
         } else {
-            showStatus('Please select a PDF file', true);
+            showStatus('Please select a PDF or TXT file', true);
         }
     });
 

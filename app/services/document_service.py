@@ -19,12 +19,18 @@ class DocumentService:
     async def upload_document(self, file_content: bytes, filename: str, collection_id: str) -> Tuple[int, int]:
         logger.info(f"Processing document: {filename} for collection: {collection_id}")
         
-        # Process PDF and get chunks
-        chunks_with_pages = process_pdf(file_content)
-        
-        if not chunks_with_pages:
-            logger.error("Could not extract text from PDF")
-            raise ValueError("Could not extract text from PDF")
+        # Process file based on type
+        if file_content.startswith(b'%PDF'):
+            chunks_with_pages = process_pdf(file_content)
+            if not chunks_with_pages:
+                logger.error("Could not extract text from PDF")
+                raise ValueError("Could not extract text from PDF")
+        else:
+            # Process text file
+            text_content = file_content.decode('utf-8')
+            # Split into chunks of approximately 1000 characters
+            chunks = [text_content[i:i+1000] for i in range(0, len(text_content), 1000)]
+            chunks_with_pages = [(chunk, 1) for chunk in chunks]  # All chunks are "page 1" for text files
 
         # Check if collection exists
         result = await self.db.execute(
