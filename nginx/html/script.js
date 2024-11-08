@@ -13,7 +13,7 @@ function showSection(sectionName, documentId = null) {
 
     if (sectionName === 'query') {
         document.getElementById('queryLink').classList.add('bg-gray-700');
-        fetchCollectionsForQueryDropdown();
+        fetchCollectionsForDropdown();
     } else if (sectionName === 'collections') {
         document.getElementById('collectionsLink').classList.add('bg-gray-700');
         fetchCollections();
@@ -28,29 +28,7 @@ function showSection(sectionName, documentId = null) {
     console.log(`Showing section: ${sectionName}, Document ID: ${documentId}`);
 }
 
-async function fetchCollectionsForQueryDropdown() {
-    try {
-        const response = await fetch('/api/collections');
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const collections = await response.json();
-        const queryCollectionSelect = document.getElementById('queryCollectionSelect');
-        queryCollectionSelect.innerHTML = '<option value="Default">Default</option>';
-        collections.forEach(collection => {
-            if (collection !== 'Default') {
-                const option = document.createElement('option');
-                option.value = collection;
-                option.textContent = collection;
-                queryCollectionSelect.appendChild(option);
-            }
-        });
-        initCustomSelect('queryCollectionSelect');
-    } catch (error) {
-        console.error('Error fetching collections for query:', error);
-        showStatus('Error loading collections for query. Please try again.', true);
-    }
-}
+
 
 async function performQuery(query, collection) {
     try {
@@ -370,16 +348,42 @@ function showStatus(message, isError = false) {
     }, 5000);
 }
 
-// Fetch collections and populate the dropdown
-async function fetchCollectionsForDropdown() {
+async function fetchCollectionsForQueryDropdown() {
     try {
+        console.log('fetchCollectionsForQueryDropdown');
         const response = await fetch('/api/collections');
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         const collections = await response.json();
         const queryCollectionSelect = document.getElementById('queryCollectionSelect');
-        queryCollectionSelect.innerHTML = '<li><button type="button" class="inline-flex w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white" data-value="Default">Default</button></li>';
+        queryCollectionSelect.innerHTML = '<option value="Default">Default</option>';
+        collections.forEach(collection => {
+            if (collection !== 'Default') {
+                const option = document.createElement('option');
+                option.value = collection;
+                option.textContent = collection;
+                queryCollectionSelect.appendChild(option);
+            }
+        });
+        initCustomSelect('queryCollectionSelect');
+    } catch (error) {
+        console.error('Error fetching collections for query:', error);
+        showStatus('Error loading collections for query. Please try again.', true);
+    }
+}
+
+// Fetch collections and populate the dropdown
+async function fetchCollectionsForDropdown() {
+    try {
+        console.log("fetchCollectionsForDropdown");
+        const response = await fetch('/api/collections');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const collections = await response.json();
+        const queryCollectionSelect = document.getElementById('queryCollectionSelect');
+        queryCollectionSelect.innerHTML = '<li><button type="button" class="inline-flex w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white" data-value="-">All collections</button></li>';
         collections.forEach(collection => {
             queryCollectionSelect.innerHTML += `<li><button type="button" class="inline-flex w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white" data-value="${collection}">${collection}</button></li>`;
         });
@@ -396,7 +400,7 @@ async function fetchCollectionsForDropdown() {
         // Toggle dropdown visibility
         document.getElementById('dropdown-button').addEventListener('click', function(event) {
             event.preventDefault();
-            document.getElementById('dropdown').classList.toggle('hidden');
+            document.getElementById('dropdown').classList.remove('hidden');
         });
 
         // Close dropdown when clicking outside
