@@ -857,6 +857,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('dropArea').classList.remove('hidden');
             uploadSpinner.classList.add('hidden');
             document.querySelector('#uploadForm button[type="submit"]').disabled = false;
+            document.querySelector('#uploadForm button[type="submit"]').classList.remove('hidden');
         }
     });
 
