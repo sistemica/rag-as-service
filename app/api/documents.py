@@ -26,7 +26,7 @@ async def query_documents(
             raise HTTPException(status_code=400, detail="Query text is required")
 
         # Log the search query for debugging
-        logger.debug(f"Searching for: '{query_text}' in collection: {collection_name}")
+        logger.debug(f"Searching for: '{query_text}' in collection: {collection_name if collection_name != '-' else 'all collections'}")
 
         # Get the embedding for the query
         query_embedding = await get_embeddings([query_text])
@@ -39,25 +39,35 @@ async def query_documents(
         chunk_table = ChunkOllama if settings.EMBEDDING_PROVIDER == EmbeddingProvider.OLLAMA else ChunkOpenAI
 
         # First get exact text matches
-        text_matches = select(
+        text_matches_query = select(
             chunk_table.content,
             chunk_table.chunk_index,
             Document.filename,
             func.cast(0.0, Float).label("distance")  # Give text matches a distance of 0
-        ).join(Document).join(Collection).where(
-            Collection.name == collection_name,
+        ).join(Document).join(Collection)
+
+        # Add collection filter only if not searching all collections
+        if collection_name != '-':
+            text_matches_query = text_matches_query.where(Collection.name == collection_name)
+        
+        # Add content search condition
+        text_matches = text_matches_query.where(
             func.lower(chunk_table.content).contains(func.lower(query_text))
         )
 
         # Then get vector similarity matches
-        vector_matches = select(
+        vector_matches_query = select(
             chunk_table.content,
             chunk_table.chunk_index,
             Document.filename,
             func.l2_distance(chunk_table.content_vector, func.cast(query_embedding, Vector)).label("distance")
-        ).join(Document).join(Collection).where(
-            Collection.name == collection_name
-        ).order_by("distance").limit(5)
+        ).join(Document).join(Collection)
+
+        # Add collection filter only if not searching all collections
+        if collection_name != '-':
+            vector_matches_query = vector_matches_query.where(Collection.name == collection_name)
+        
+        vector_matches = vector_matches_query.order_by("distance").limit(5)
 
         # Combine results with text matches first, then vector matches
         results = await db.execute(
