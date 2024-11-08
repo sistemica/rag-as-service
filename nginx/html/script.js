@@ -739,8 +739,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
+            // Hide the form elements and show spinner
+            document.getElementById('dropArea').classList.add('hidden');
+            document.getElementById('status').classList.remove('hidden');
             uploadSpinner.classList.remove('hidden');
-            document.getElementById('status').classList.add('hidden');
+            document.querySelector('#uploadForm button[type="submit"]').disabled = true;
 
             const formData = new FormData();
             formData.append('file', file);
@@ -757,19 +760,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (response.ok) {
                 showStatus('Document uploaded successfully');
-                form.reset();
-                selectedFileName.textContent = '';
-                // Refresh the documents list
-                fetchDocuments();
+                setTimeout(() => {
+                    form.reset();
+                    selectedFileName.textContent = '';
+                    // Reset the form view
+                    document.getElementById('dropArea').classList.remove('hidden');
+                    uploadSpinner.classList.add('hidden');
+                    document.querySelector('#uploadForm button[type="submit"]').disabled = false;
+                    // Refresh the documents list and switch to documents view
+                    fetchDocuments();
+                    showSection('documents');
+                }, 2000); // Show success message for 2 seconds before switching
             } else {
                 showStatus(data.detail || 'Upload failed. Please try again.', true);
+                // Reset the form view on error
+                document.getElementById('dropArea').classList.remove('hidden');
+                uploadSpinner.classList.add('hidden');
+                document.querySelector('#uploadForm button[type="submit"]').disabled = false;
             }
         } catch (error) {
             console.error('Error:', error);
             showStatus('Error uploading file. Please check your connection and try again.', true);
-        } finally {
-            submitBtn.disabled = false;
+            // Reset the form view on error
+            document.getElementById('dropArea').classList.remove('hidden');
             uploadSpinner.classList.add('hidden');
+            document.querySelector('#uploadForm button[type="submit"]').disabled = false;
         }
     });
 
