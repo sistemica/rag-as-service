@@ -141,6 +141,8 @@
                 </table>
             </div>
         </div>
+
+
         <div id="collectionsSection" class="hidden">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-2xl font-bold">Collections</h2>
@@ -148,7 +150,19 @@
                     <i class="fas fa-plus mr-2"></i> New Collection
                 </button>
             </div>
-            <ul id="collectionsList" class="bg-white shadow rounded-lg divide-y"></ul>
+            <div class="overflow-x-auto mt-20">
+                <table id="collectionsTable" class="min-w-full bg-white shadow rounded-lg">
+                    <thead>
+                        <tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
+                            <th class="py-3 px-6 text-left">Collection Name</th>
+                            <th class="py-3 px-6 text-left">Document Count</th>
+                            <th class="py-3 px-6 text-left">Total Chunks</th>
+                            <th class="py-3 px-6 text-left">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="collectionsList"></tbody>
+                </table>
+            </div>
             <p id="noCollectionsMessage" class="text-gray-600 mt-4 hidden">No collections found.</p>
         </div>
 

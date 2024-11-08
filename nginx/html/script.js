@@ -207,27 +207,111 @@ function cancelUpload() {
 
 async function fetchCollections() {
     try {
-        const response = await fetch('/api/collections');
-        const collections = await response.json();
+        // Debug log - Check if function is called
+        console.log('Fetching collections...');
+
+        // Fetch collections
+        const collectionsResponse = await fetch('/api/collections');
+        console.log('Collections response:', collectionsResponse);
+        
+        if (!collectionsResponse.ok) {
+            throw new Error(`HTTP error! status: ${collectionsResponse.status}`);
+        }
+        
+        const collections = await collectionsResponse.json();
+        console.log('Collections data:', collections);
+
+        // Fetch documents
+        const documentsResponse = await fetch('/api/documents');
+        console.log('Documents response:', documentsResponse);
+        
+        if (!documentsResponse.ok) {
+            throw new Error(`HTTP error! status: ${documentsResponse.status}`);
+        }
+        
+        const documents = await documentsResponse.json();
+        console.log('Documents data:', documents);
+
         const collectionsList = document.getElementById('collectionsList');
         const noCollectionsMessage = document.getElementById('noCollectionsMessage');
+        const collectionsTable = document.getElementById('collectionsTable');
         
-        if (collections.length === 0) {
+        if (!collections || collections.length === 0) {
+            console.log('No collections found');
             collectionsList.innerHTML = '';
             noCollectionsMessage.classList.remove('hidden');
-        } else {
-            noCollectionsMessage.classList.add('hidden');
-            collectionsList.innerHTML = collections.map(collection => `
-                <li class="px-4 py-3 hover:bg-gray-50 transition flex justify-between items-center">
-                    <span><i class="fas fa-folder mr-2 text-gray-600"></i>${collection}</span>
-                    <button onclick="deleteCollection('${collection}')" class="text-red-600 hover:text-red-800">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </li>
-            `).join('');
+            collectionsTable.classList.add('hidden');
+            return;
         }
+
+        // Process collection statistics with null checks
+        const collectionStats = collections.reduce((acc, collection) => {
+            if (!collection) return acc;
+            
+            const collectionDocs = documents.filter(doc => 
+                doc && doc.collection_name === collection
+            );
+            
+            acc[collection] = {
+                documentCount: collectionDocs.length,
+                chunkCount: collectionDocs.reduce((sum, doc) => 
+                    sum + (doc.chunk_count || 0), 0
+                )
+            };
+            return acc;
+        }, {});
+
+        console.log('Collection stats:', collectionStats);
+
+        noCollectionsMessage.classList.add('hidden');
+        collectionsTable.classList.remove('hidden');
+        
+        // Generate table rows with null checks
+        collectionsList.innerHTML = collections.map(collection => {
+            if (!collection) return '';
+            
+            const stats = collectionStats[collection] || { documentCount: 0, chunkCount: 0 };
+            
+            return `
+                <tr class="border-b border-gray-200 hover:bg-gray-100">
+                    <td class="py-3 px-6 text-left">
+                        <div class="flex items-center">
+                            <i class="fas fa-folder mr-2 text-gray-600"></i>
+                            <span>${collection}</span>
+                        </div>
+                    </td>
+                    <td class="py-3 px-6 text-left">${stats.documentCount}</td>
+                    <td class="py-3 px-6 text-left">${stats.chunkCount}</td>
+                    <td class="py-3 px-6 text-left">
+                        <button onclick="deleteCollection('${collection}')" 
+                                class="text-red-600 hover:text-red-800 flex items-center">
+                            <i class="fas fa-trash mr-1"></i>
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+
+        // Debug log - Final HTML
+        console.log('Generated table HTML:', collectionsList.innerHTML);
+
     } catch (error) {
-        console.error('Error fetching collections:', error);
+        console.error('Error in fetchCollections:', error);
+        const collectionsList = document.getElementById('collectionsList');
+        const noCollectionsMessage = document.getElementById('noCollectionsMessage');
+        const collectionsTable = document.getElementById('collectionsTable');
+
+        // Show error message in table
+        collectionsTable.classList.remove('hidden');
+        noCollectionsMessage.classList.add('hidden');
+        collectionsList.innerHTML = `
+            <tr>
+                <td colspan="4" class="px-4 py-3 text-red-600">
+                    Error loading collections: ${error.message}. Please try again later.
+                </td>
+            </tr>
+        `;
     }
 }
 
