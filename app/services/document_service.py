@@ -21,14 +21,15 @@ class DocumentService:
         
         try:
             # Process file based on type
-            if isinstance(file_content, bytes) and file_content.startswith(b'%PDF'):
-                chunks_with_pages = process_pdf(file_content)
-                if not chunks_with_pages:
-                    logger.error("Could not extract text from PDF")
-                    raise ValueError("Could not extract text from PDF")
-            else:
-                # Process text file
-                text_content = file_content.decode('utf-8', errors='replace')
+            if isinstance(file_content, bytes):
+                if file_content.startswith(b'%PDF'):
+                    chunks_with_pages = process_pdf(file_content)
+                    if not chunks_with_pages:
+                        logger.error("Could not extract text from PDF")
+                        raise ValueError("Could not extract text from PDF")
+                else:
+                    # Process text or markdown file
+                    text_content = file_content.decode('utf-8', errors='replace')
                 # Split into chunks of approximately 1000 characters, preserving word boundaries
                 chunks = []
                 current_pos = 0
