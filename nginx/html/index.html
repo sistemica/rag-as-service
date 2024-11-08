@@ -92,7 +92,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="/docs" target="_blank" class="block py-2 px-4 rounded hover:bg-gray-700 transition">
+                    <a href="#" onclick="showSection('api')" class="block py-2 px-4 rounded hover:bg-gray-700 transition" id="apiLink">
                         <i class="fas fa-book mr-2"></i> API Documentation
                     </a>
                 </li>
@@ -293,6 +293,14 @@
                     </thead>
                     <tbody id="documentChunksList"></tbody>
                 </table>
+            </div>
+        </div>
+
+        <!-- API Documentation Section -->
+        <div id="apiSection" class="hidden h-full">
+            <h2 class="text-2xl font-bold mb-4">API Documentation</h2>
+            <div class="w-full h-[calc(100vh-8rem)] bg-white rounded-lg shadow-md overflow-hidden">
+                <iframe src="/docs" class="w-full h-full border-0"></iframe>
             </div>
         </div>
     </main>

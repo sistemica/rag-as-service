@@ -4,6 +4,7 @@ function showSection(sectionName, documentId = null) {
     document.getElementById('documentsSection').classList.add('hidden');
     document.getElementById('uploadFormSection').classList.add('hidden');
     document.getElementById('documentChunksSection').classList.add('hidden');
+    document.getElementById('apiSection').classList.add('hidden');
     document.getElementById(`${sectionName}Section`).classList.remove('hidden');
 
     // Update active menu item
