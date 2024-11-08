@@ -39,13 +39,18 @@ async def query_documents(
         chunk_table = ChunkOllama if settings.EMBEDDING_PROVIDER == EmbeddingProvider.OLLAMA else ChunkOpenAI
 
         # First get exact text matches
-        text_matches_query = select(
-            chunk_table.content,
-            chunk_table.chunk_index,
-            Document.filename,
-            Collection.name.label('collection_name'),
-            func.cast(0.0, Float).label("distance")  # Give text matches a distance of 0
-        ).join(Document).join(Collection)
+        text_matches_query = (
+            select(
+                chunk_table.content,
+                chunk_table.chunk_index,
+                Document.filename,
+                Collection.name.label('collection_name'),
+                func.cast(0.0, Float).label("distance")  # Give text matches a distance of 0
+            )
+            .select_from(chunk_table)
+            .join(Document, chunk_table.document_id == Document.id)
+            .join(Collection, Document.collection_id == Collection.id)
+        )
 
         # Add collection filter only if not searching all collections
         if collection_name != '-':
@@ -57,13 +62,18 @@ async def query_documents(
         )
 
         # Then get vector similarity matches
-        vector_matches_query = select(
-            chunk_table.content,
-            chunk_table.chunk_index,
-            Document.filename,
-            Collection.name.label('collection_name'),
-            func.l2_distance(chunk_table.content_vector, func.cast(query_embedding, Vector)).label("distance")
-        ).join(Document).join(Collection)
+        vector_matches_query = (
+            select(
+                chunk_table.content,
+                chunk_table.chunk_index,
+                Document.filename,
+                Collection.name.label('collection_name'),
+                func.l2_distance(chunk_table.content_vector, func.cast(query_embedding, Vector)).label("distance")
+            )
+            .select_from(chunk_table)
+            .join(Document, chunk_table.document_id == Document.id)
+            .join(Collection, Document.collection_id == Collection.id)
+        )
 
         # Add collection filter only if not searching all collections
         if collection_name != '-':
