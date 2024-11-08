@@ -177,19 +177,25 @@ After starting the service, visit:
 
 #### Upload Document
 ```http
+# Upload file
 POST /documents/upload
 Header: Collection-Name: <collection_name>
 Body: form-data
   - file: PDF, TXT, or MD file
 
-# Or for text content:
+# Upload text content
 POST /documents/upload/text
 Header: Collection-Name: <collection_name>
-Body: JSON
-{
-    "name": "document_name.txt",
-    "content": "Your text content here"
-}
+Header: Document-Name: <document_name>
+Content-Type: text/plain
+Body: Your text content here
+
+# Example using curl:
+curl -X POST "http://localhost:8000/api/documents/upload/text" \
+  -H "Content-Type: text/plain" \
+  -H "Collection-Name: Default" \
+  -H "Document-Name: example.txt" \
+  -d "This is the text content to upload"
 ```
 
 #### Search Documents
