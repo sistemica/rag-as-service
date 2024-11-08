@@ -776,6 +776,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
 
             if (response.ok) {
+                document.getElementById('uploadSpinner').classList.add('hidden');
                 showStatus('Document uploaded successfully');
                 setTimeout(() => {
                     form.reset();
