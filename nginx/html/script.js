@@ -647,7 +647,7 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         dropArea.classList.remove('border-indigo-500');
         const file = e.dataTransfer.files[0];
-        if (file && (file.type === 'application/pdf' || file.type === 'text/plain')) {
+        if (file && (file.type === 'application/pdf' || file.type === 'text/plain' || file.type === 'text/markdown')) {
             fileInput.files = e.dataTransfer.files;
             selectedFileName.textContent = file.name;
         } else {

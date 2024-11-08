@@ -199,8 +199,10 @@ async def upload_document(
     if not collection_name:
         raise HTTPException(status_code=400, detail="No Collection-Name provided in header")
 
-    if not file.filename or not (file.filename.lower().endswith('.pdf') or file.filename.lower().endswith('.txt')):
-        raise HTTPException(status_code=400, detail="Only PDF and TXT files are supported")
+    if not file.filename or not (file.filename.lower().endswith('.pdf') or 
+                                file.filename.lower().endswith('.txt') or 
+                                file.filename.lower().endswith('.md')):
+        raise HTTPException(status_code=400, detail="Only PDF, TXT, and MD files are supported")
 
     try:
         content = await file.read()
