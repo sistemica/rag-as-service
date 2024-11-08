@@ -146,9 +146,9 @@ async def delete_document(document_id: int, db: AsyncSession = Depends(get_db)):
         logger.error(f"Error deleting document: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
-@router.post("/documents/upload/text")
+@router.post("/documents/upload/text", status_code=201)
 async def upload_text_document(
-    content: str = Body(...),
+    content: str = Body(..., media_type="text/plain"),
     collection_name: Optional[str] = Header(None, alias="Collection-Name", description="Collection Name"),
     document_name: Optional[str] = Header(None, alias="Document-Name", description="Document Name"),
     db: AsyncSession = Depends(get_db)
