@@ -195,12 +195,15 @@ async function showUploadForm() {
         document.getElementById('uploadFormSection').classList.remove('hidden');
         
         // Reset the form state
+        const form = document.getElementById('uploadForm');
         const fileInput = document.getElementById('pdfFile');
+        form.reset();
         fileInput.value = '';
         updateFilePreview(null);
         document.getElementById('uploadArea').classList.remove('hidden');
         document.getElementById('uploadStatus').classList.add('hidden');
         state.setUploadStatus(null); // Clear the status when opening the upload form
+        document.querySelector('#uploadForm button[type="submit"]').disabled = true;
     } catch (error) {
         console.error('Error fetching collections:', error);
         showStatus('Error loading collections. Please try again.', true);
@@ -772,6 +775,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 setTimeout(() => {
                     form.reset();
                     selectedFileName.textContent = '';
+                    fileInput.value = '';
+                    updateFilePreview(null);
                     // Reset the form view
                     document.getElementById('uploadArea').classList.remove('hidden');
                     document.getElementById('uploadStatus').classList.add('hidden');
