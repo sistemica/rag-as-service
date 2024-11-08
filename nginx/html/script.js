@@ -211,8 +211,13 @@ async function showUploadForm() {
 }
 
 function cancelUpload() {
-    document.getElementById('uploadForm').reset();
+    const form = document.getElementById('uploadForm');
+    const fileInput = document.getElementById('pdfFile');
+    form.reset();
+    fileInput.value = '';
     document.getElementById('selectedFileName').textContent = '';
+    document.getElementById('uploadPrompt').classList.remove('hidden');
+    document.getElementById('filePreview').classList.add('hidden');
     document.getElementById('uploadFormSection').classList.add('hidden');
     document.getElementById('documentsSection').classList.remove('hidden');
 }
