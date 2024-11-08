@@ -14,9 +14,6 @@ from app.core.config import settings, EmbeddingProvider
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
-class TextDocumentUpload(BaseModel):
-    name: str
-    content: str
 
 @router.post("/query")
 async def query_documents(
@@ -151,18 +148,22 @@ async def delete_document(document_id: int, db: AsyncSession = Depends(get_db)):
 
 @router.post("/documents/upload/text")
 async def upload_text_document(
-    document: TextDocumentUpload,
+    content: str = Body(...),
     collection_name: Optional[str] = Header(None, alias="Collection-Name", description="Collection Name"),
+    document_name: Optional[str] = Header(None, alias="Document-Name", description="Document Name"),
     db: AsyncSession = Depends(get_db)
 ):
     if not collection_name:
         raise HTTPException(status_code=400, detail="No Collection-Name provided in header")
+    
+    if not document_name:
+        raise HTTPException(status_code=400, detail="No Document-Name provided in header")
 
     try:
         document_service = DocumentService(db)
         document_id, chunks_created = await document_service.upload_document(
-            document.content.encode('utf-8'),
-            document.name,
+            content.encode('utf-8'),
+            document_name,
             collection_name
         )
         
