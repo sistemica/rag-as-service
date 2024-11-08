@@ -666,6 +666,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const file = fileInput.files[0];
         if (file) {
             selectedFileName.textContent = file.name;
+            updateFilePreview(file);
+        } else {
+            updateFilePreview(null);
         }
     });
 
