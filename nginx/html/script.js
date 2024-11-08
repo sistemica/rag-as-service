@@ -33,30 +33,30 @@ function showSection(sectionName, documentId = null) {
 function toggleChunk(row) {
     // Check if there's already an expanded row
     const existingExpanded = document.querySelector('.expanded-chunk');
+    const wasClickedRowExpanded = existingExpanded && existingExpanded.previousElementSibling === row;
+    
+    // Always remove existing expanded row
     if (existingExpanded) {
         existingExpanded.remove();
     }
 
-    // If we clicked on the same row that was expanded, just remove it and return
-    if (existingExpanded && existingExpanded.previousElementSibling === row) {
-        return;
+    // If we didn't click the already expanded row, create new expanded row
+    if (!wasClickedRowExpanded) {
+        const expandedRow = document.createElement('tr');
+        expandedRow.className = 'expanded-chunk bg-gray-50';
+        const fullContent = row.querySelector('.chunk-full').textContent;
+        
+        expandedRow.innerHTML = `
+            <td colspan="4" class="py-4 px-6">
+                <div class="whitespace-pre-wrap bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                    ${fullContent}
+                </div>
+            </td>
+        `;
+
+        // Insert after the clicked row
+        row.parentNode.insertBefore(expandedRow, row.nextSibling);
     }
-
-    // Create new row for full content
-    const expandedRow = document.createElement('tr');
-    expandedRow.className = 'expanded-chunk bg-gray-50';
-    const fullContent = row.querySelector('.chunk-full').textContent;
-    
-    expandedRow.innerHTML = `
-        <td colspan="4" class="py-4 px-6">
-            <div class="whitespace-pre-wrap bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                ${fullContent}
-            </div>
-        </td>
-    `;
-
-    // Insert after the clicked row
-    row.parentNode.insertBefore(expandedRow, row.nextSibling);
 }
 
 async function performQuery(query, collection) {
