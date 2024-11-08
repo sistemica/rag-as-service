@@ -69,7 +69,7 @@ async function performQuery(query, collections) {
             },
             body: JSON.stringify({ 
                 query: query,
-                collections: collections.length ? collections.join(',') : 'Default'
+                collections: collections && collections.length ? collections.join(',') : 'Default'
             }),
         });
 
@@ -870,8 +870,15 @@ document.addEventListener('DOMContentLoaded', () => {
     queryForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const query = document.getElementById('queryInput').value;
-        const selectedCollections = Array.from(document.querySelectorAll('#queryCollectionSelect button.selected'))
-            .map(btn => btn.getAttribute('data-value'));
+        const selectedButtons = document.querySelectorAll('#queryCollectionSelect button.selected');
+        let selectedCollections;
+            
+        if (selectedButtons.length === 0 || Array.from(selectedButtons).some(btn => btn.getAttribute('data-value') === '-')) {
+            selectedCollections = ['-'];
+        } else {
+            selectedCollections = Array.from(selectedButtons).map(btn => btn.getAttribute('data-value'));
+        }
+            
         await performQuery(query, selectedCollections);
     });
 

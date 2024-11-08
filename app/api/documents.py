@@ -22,9 +22,11 @@ async def query_documents(
 ):
     try:
         query_text = query.get("query").strip().lower()
-        collections = query.get("collections", ["Default"])
+        collections = query.get("collections", "Default")
         if isinstance(collections, str):
             collections = [c.strip() for c in collections.split(',') if c.strip()]
+        if not collections:
+            collections = ["Default"]
 
         if not query_text:
             raise HTTPException(status_code=400, detail="Query text is required")
@@ -57,7 +59,7 @@ async def query_documents(
         )
 
         # Add collection filter if specific collections are selected
-        if collections != ['-']:
+        if '-' not in collections:
             text_matches_query = text_matches_query.where(Collection.name.in_(collections))
         
         # Add content search condition
@@ -80,7 +82,7 @@ async def query_documents(
         )
 
         # Add collection filter if specific collections are selected
-        if collections != ['-']:
+        if '-' not in collections:
             vector_matches_query = vector_matches_query.where(Collection.name.in_(collections))
         
         vector_matches = vector_matches_query.order_by("distance").limit(5)
