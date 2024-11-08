@@ -82,13 +82,14 @@ async function performQuery(query, collection) {
         queryResults.classList.remove('hidden');
         queryResultsList.innerHTML = results.map(result => `
             <tr class="border-b border-gray-200 hover:bg-gray-100 cursor-pointer" onclick="toggleChunk(this)">
-                <td class="py-3 px-6 text-left">${result.chunk_number}</td>
                 <td class="py-3 px-6 text-left">
                     <div class="chunk-preview">${result.chunk_content.substring(0, 100)}...</div>
                     <div class="chunk-full hidden">${result.chunk_content}</div>
                 </td>
                 <td class="py-3 px-6 text-left">${result.distance.toFixed(4)}</td>
+                <td class="py-3 px-6 text-left">${result.collection_name}</td>
                 <td class="py-3 px-6 text-left">${result.document_filename}</td>
+                <td class="py-3 px-6 text-left">${result.chunk_number}</td>
             </tr>
         `).join('');
     } catch (error) {

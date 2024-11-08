@@ -43,6 +43,7 @@ async def query_documents(
             chunk_table.content,
             chunk_table.chunk_index,
             Document.filename,
+            Collection.name.label('collection_name'),
             func.cast(0.0, Float).label("distance")  # Give text matches a distance of 0
         ).join(Document).join(Collection)
 
@@ -60,6 +61,7 @@ async def query_documents(
             chunk_table.content,
             chunk_table.chunk_index,
             Document.filename,
+            Collection.name.label('collection_name'),
             func.l2_distance(chunk_table.content_vector, func.cast(query_embedding, Vector)).label("distance")
         ).join(Document).join(Collection)
 
@@ -100,6 +102,7 @@ async def query_documents(
             search_results.append({
                 "chunk_content": row.content,
                 "document_filename": row.filename,
+                "collection_name": row.collection_name,
                 "distance": distance,
                 "chunk_number": row.chunk_index
             })
