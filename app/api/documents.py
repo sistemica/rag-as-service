@@ -155,6 +155,8 @@ async def upload_text_document(
     content: str = Body(..., media_type="text/plain"),
     collection_name: Optional[str] = Header(None, alias="Collection-Name", description="Collection Name"),
     document_name: Optional[str] = Header(None, alias="Document-Name", description="Document Name"),
+    chunk_size: Optional[int] = Header(None, alias="Chunk-Size", description="Custom chunk size"),
+    chunk_overlap: Optional[int] = Header(None, alias="Chunk-Overlap", description="Custom chunk overlap"),
     db: AsyncSession = Depends(get_db)
 ):
     if not collection_name:
@@ -168,7 +170,9 @@ async def upload_text_document(
         document_id, chunks_created = await document_service.upload_document(
             content.encode('utf-8'),
             document_name,
-            collection_name
+            collection_name,
+            chunk_size,
+            chunk_overlap
         )
         
         return {
@@ -253,6 +257,8 @@ async def get_document_chunks(document_id: int, db: AsyncSession = Depends(get_d
 async def upload_document(
     file: UploadFile = File(...),
     collection_name: Optional[str] = Header(None, alias="Collection-Name", description="Collection Name"),
+    chunk_size: Optional[int] = Header(None, alias="Chunk-Size", description="Custom chunk size"),
+    chunk_overlap: Optional[int] = Header(None, alias="Chunk-Overlap", description="Custom chunk overlap"),
     db: AsyncSession = Depends(get_db)
 ):
     if not file:
@@ -276,7 +282,13 @@ async def upload_document(
             raise HTTPException(status_code=400, detail="Invalid PDF file")
 
         document_service = DocumentService(db)
-        document_id, chunks_created = await document_service.upload_document(content, file.filename, collection_name)
+        document_id, chunks_created = await document_service.upload_document(
+            content, 
+            file.filename, 
+            collection_name,
+            chunk_size,
+            chunk_overlap
+        )
         
         return {
             "message": "Document uploaded successfully",

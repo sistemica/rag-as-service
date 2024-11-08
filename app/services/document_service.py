@@ -16,8 +16,18 @@ class DocumentService:
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    async def upload_document(self, file_content: bytes, filename: str, collection_id: str) -> Tuple[int, int]:
+    async def upload_document(
+        self, 
+        file_content: bytes, 
+        filename: str, 
+        collection_id: str,
+        chunk_size: int = None,
+        chunk_overlap: int = None
+    ) -> Tuple[int, int]:
         logger.info(f"Processing document: {filename} for collection: {collection_id}")
+        # Use default values from settings if not provided
+        chunk_size = chunk_size or settings.CHUNK_SIZE
+        chunk_overlap = chunk_overlap or settings.CHUNK_OVERLAP
         
         try:
             # Process file based on type
@@ -30,18 +40,19 @@ class DocumentService:
                 else:
                     # Process text or markdown file
                     text_content = file_content.decode('utf-8', errors='replace')
-                # Split into chunks of approximately 1000 characters, preserving word boundaries
+                # Split into chunks with specified size and overlap
                 chunks = []
                 current_pos = 0
                 while current_pos < len(text_content):
-                    chunk_end = min(current_pos + 1000, len(text_content))
+                    chunk_end = min(current_pos + chunk_size, len(text_content))
                     # If we're not at the end, find the last space to break at
                     if chunk_end < len(text_content):
                         last_space = text_content.rfind(' ', current_pos, chunk_end)
                         if last_space != -1:
                             chunk_end = last_space
                     chunks.append(text_content[current_pos:chunk_end].strip())
-                    current_pos = chunk_end
+                    # Move position considering overlap
+                    current_pos = max(current_pos + 1, chunk_end - chunk_overlap)
                 chunks_with_pages = [(chunk, 1) for chunk in chunks if chunk]  # All chunks are "page 1" for text files
         except UnicodeDecodeError as e:
             logger.error(f"Error decoding text file: {e}")
