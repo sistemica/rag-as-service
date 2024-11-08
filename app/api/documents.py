@@ -207,7 +207,8 @@ async def upload_document(
         if not content:
             raise HTTPException(status_code=400, detail="Empty file provided")
 
-        if not content.startswith(b'%PDF'):
+        # Check if it's a PDF or text file
+        if file.filename.lower().endswith('.pdf') and not content.startswith(b'%PDF'):
             raise HTTPException(status_code=400, detail="Invalid PDF file")
 
         document_service = DocumentService(db)
