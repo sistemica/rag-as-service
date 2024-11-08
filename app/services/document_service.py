@@ -40,20 +40,20 @@ class DocumentService:
                 else:
                     # Process text or markdown file
                     text_content = file_content.decode('utf-8', errors='replace')
-                # Split into chunks with specified size and overlap
-                chunks = []
-                current_pos = 0
-                while current_pos < len(text_content):
-                    chunk_end = min(current_pos + chunk_size, len(text_content))
-                    # If we're not at the end, find the last space to break at
-                    if chunk_end < len(text_content):
-                        last_space = text_content.rfind(' ', current_pos, chunk_end)
-                        if last_space != -1:
-                            chunk_end = last_space
-                    chunks.append(text_content[current_pos:chunk_end].strip())
-                    # Move position considering overlap
-                    current_pos = max(current_pos + 1, chunk_end - chunk_overlap)
-                chunks_with_pages = [(chunk, 1) for chunk in chunks if chunk]  # All chunks are "page 1" for text files
+                    # Split into chunks with specified size and overlap
+                    chunks = []
+                    current_pos = 0
+                    while current_pos < len(text_content):
+                        chunk_end = min(current_pos + chunk_size, len(text_content))
+                        # If we're not at the end, find the last space to break at
+                        if chunk_end < len(text_content):
+                            last_space = text_content.rfind(' ', current_pos, chunk_end)
+                            if last_space != -1:
+                                chunk_end = last_space
+                        chunks.append(text_content[current_pos:chunk_end].strip())
+                        # Move position considering overlap
+                        current_pos = max(current_pos + 1, chunk_end - chunk_overlap)
+                    chunks_with_pages = [(chunk, 1) for chunk in chunks if chunk]  # All chunks are "page 1" for text files
         except UnicodeDecodeError as e:
             logger.error(f"Error decoding text file: {e}")
             raise ValueError("Invalid text file encoding. Please ensure the file is UTF-8 encoded.")
