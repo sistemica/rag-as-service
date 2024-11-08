@@ -39,6 +39,7 @@ async def query_documents(
         results = await db.execute(
             select(
                 chunk_table.content,
+                chunk_table.chunk_index,
                 Document.filename,
                 func.l2_distance(chunk_table.content_vector, func.cast(query_embedding, Vector)).label("distance")
             )
@@ -73,7 +74,8 @@ async def query_documents(
             search_results.append({
                 "chunk_content": row.content,
                 "document_filename": row.filename,
-                "distance": distance
+                "distance": distance,
+                "chunk_number": row.chunk_index
             })
 
         logger.debug(f"Search results: {search_results}")
