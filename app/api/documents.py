@@ -38,31 +38,30 @@ async def query_documents(
         # Select the appropriate chunk table based on the embedding provider
         chunk_table = ChunkOllama if settings.EMBEDDING_PROVIDER == EmbeddingProvider.OLLAMA else ChunkOpenAI
 
-        # Perform combined text and vector search
+        # First get exact text matches
+        text_matches = select(
+            chunk_table.content,
+            chunk_table.chunk_index,
+            Document.filename,
+            func.cast(0.0, Float).label("distance")  # Give text matches a distance of 0
+        ).join(Document).join(Collection).where(
+            Collection.name == collection_name,
+            func.lower(chunk_table.content).contains(func.lower(query_text))
+        )
+
+        # Then get vector similarity matches
+        vector_matches = select(
+            chunk_table.content,
+            chunk_table.chunk_index,
+            Document.filename,
+            func.l2_distance(chunk_table.content_vector, func.cast(query_embedding, Vector)).label("distance")
+        ).join(Document).join(Collection).where(
+            Collection.name == collection_name
+        ).order_by("distance").limit(5)
+
+        # Combine results with text matches first, then vector matches
         results = await db.execute(
-            select(
-                chunk_table.content,
-                chunk_table.chunk_index,
-                Document.filename,
-                func.l2_distance(chunk_table.content_vector, func.cast(query_embedding, Vector)).label("distance")
-            )
-            .join(Document)
-            .join(Collection)
-            .where(
-                Collection.name == collection_name,
-                func.lower(chunk_table.content).contains(func.lower(query_text))
-            )
-            .union(
-                select(
-                    chunk_table.content,
-                    chunk_table.chunk_index,
-                    Document.filename,
-                    func.l2_distance(chunk_table.content_vector, func.cast(query_embedding, Vector)).label("distance")
-                )
-                .join(Document)
-                .join(Collection)
-                .where(Collection.name == collection_name)
-            )
+            union(text_matches, vector_matches)
             .order_by("distance")
             .limit(5)
         )
