@@ -193,6 +193,13 @@ async function showUploadForm() {
         await fetchCollectionsForDropdown();
         document.getElementById('documentsSection').classList.add('hidden');
         document.getElementById('uploadFormSection').classList.remove('hidden');
+        
+        // Reset the form state
+        const fileInput = document.getElementById('pdfFile');
+        fileInput.value = '';
+        updateFilePreview(null);
+        document.getElementById('uploadArea').classList.remove('hidden');
+        document.getElementById('uploadStatus').classList.add('hidden');
         state.setUploadStatus(null); // Clear the status when opening the upload form
     } catch (error) {
         console.error('Error fetching collections:', error);
