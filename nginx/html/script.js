@@ -511,7 +511,13 @@ async function fetchCollectionsForDropdown() {
         const dropdownItems = queryCollectionSelect.querySelectorAll('button');
         dropdownItems.forEach(item => {
             item.addEventListener('click', function() {
-                document.getElementById('dropdown-button').textContent = this.textContent;
+                const dropdownButton = document.getElementById('dropdown-button');
+                dropdownButton.innerHTML = `
+                    <span class="truncate mr-1.5">${this.textContent}</span>
+                    <svg class="w-2.5 h-2.5 flex-shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
+                    </svg>
+                `;
                 document.getElementById('dropdown').classList.add('hidden');
             });
         });
