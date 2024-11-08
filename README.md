@@ -36,6 +36,10 @@ Powerful hybrid search combining vector similarity and full-text search
 
 ## 🚀 Features
 
+- **Privacy-First Design**: Built to work with local LLMs through Ollama for complete data privacy
+- **Flexible Embedding Options**: 
+  - Primary: Local embeddings via Ollama (recommended)
+  - Backup: OpenAI embeddings support (optional, requires API key)
 - **Document Processing**: Upload and process PDF, TXT, and MD files with automatic chunking
 - **Text Content Upload**: Direct text content upload via API endpoint
 - **Multiple Embedding Providers**: Support for both Ollama and OpenAI embeddings
@@ -166,8 +170,26 @@ curl -X POST "http://localhost:8000/api/documents/upload/text" \
 
 #### Search Documents
 ```http
-GET /search?query=
-Header: user_id: 
+POST /api/query
+Content-Type: application/json
+
+{
+    "query": "your search query",
+    "collections": "collection1,collection2",  // Optional, defaults to "Default"
+    "limit": 10                               // Optional, range: 5-20, default: 10
+}
+
+Response:
+[
+    {
+        "chunk_content": "Matching text content...",
+        "document_filename": "example.pdf",
+        "collection_name": "collection1",
+        "distance": 0.123,
+        "chunk_number": 1
+    }
+    // ... more results
+]
 ```
 
 ## 🚗 Deployment
@@ -184,17 +206,38 @@ docker-compose up -d
 docker pull ghcr.io/sistemica/rag-as-service:latest
 ```
 
-## 🧪 Testing
+## 🧪 Testing & Quality Assurance
 
-Run the test suite:
+### Running Tests
 ```bash
+# Run tests in Docker environment
 make test
+
+# Run tests with coverage report
+make coverage
+
+# Run tests locally in virtual environment
+make test-local
 ```
 
-Run with coverage:
+### Code Quality
 ```bash
-pytest --cov=app tests/
+# Run all linters in Docker
+make lint
+
+# Format code
+make format
+
+# Run locally in virtual environment
+make lint-local
+make format-local
 ```
+
+The project uses:
+- pytest for testing
+- black for code formatting
+- isort for import sorting
+- flake8 for code style checking
 
 ## 📈 Monitoring
 
