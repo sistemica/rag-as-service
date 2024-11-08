@@ -649,9 +649,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const file = e.dataTransfer.files[0];
         if (file && (file.type === 'application/pdf' || file.type === 'text/plain' || file.type === 'text/markdown')) {
             fileInput.files = e.dataTransfer.files;
-            selectedFileName.textContent = file.name;
+            updateFilePreview(file);
         } else {
-            showStatus('Please select a PDF or TXT file', true);
+            showStatus('Please select a PDF, TXT, or MD file', true);
         }
     });
 
@@ -680,14 +680,45 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    fileInput.addEventListener('change', () => {
-        const file = fileInput.files[0];
+    function getFileIcon(filename) {
+        if (filename.toLowerCase().endsWith('.pdf')) {
+            return 'fas fa-file-pdf text-red-500';
+        } else if (filename.toLowerCase().endsWith('.txt')) {
+            return 'fas fa-file-alt text-blue-500';
+        } else if (filename.toLowerCase().endsWith('.md')) {
+            return 'fab fa-markdown text-purple-500';
+        }
+        return 'fas fa-file text-gray-500';
+    }
+
+    function updateFilePreview(file) {
+        const uploadPrompt = document.getElementById('uploadPrompt');
+        const filePreview = document.getElementById('filePreview');
+        const fileIcon = document.getElementById('fileIcon');
+        
         if (file) {
+            uploadPrompt.classList.add('hidden');
+            filePreview.classList.remove('hidden');
+            fileIcon.className = getFileIcon(file.name);
             selectedFileName.textContent = file.name;
         } else {
+            uploadPrompt.classList.remove('hidden');
+            filePreview.classList.add('hidden');
             selectedFileName.textContent = '';
         }
         updateSubmitButton();
+    }
+
+    fileInput.addEventListener('change', () => {
+        const file = fileInput.files[0];
+        updateFilePreview(file);
+    });
+
+    // Add remove file button handler
+    document.getElementById('removeFile').addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevent triggering dropArea click
+        fileInput.value = '';
+        updateFilePreview(null);
     });
 
     collectionSelect.addEventListener('change', updateSubmitButton);

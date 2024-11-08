@@ -228,8 +228,16 @@
                 </div>
                 <div id="dropArea" class="border-2 border-dashed border-gray-300 rounded-md p-6 text-center cursor-pointer hover:border-indigo-500 transition-colors duration-300">
                     <input type="file" id="pdfFile" accept=".pdf,.txt,.md" required class="hidden">
-                    <p class="text-gray-600">Drag and drop your PDF, TXT, or MD file here or click to select</p>
-                    <p id="selectedFileName" class="mt-2 text-sm text-gray-500"></p>
+                    <div id="uploadPrompt" class="text-gray-600">
+                        <p>Drag and drop your PDF, TXT, or MD file here or click to select</p>
+                    </div>
+                    <div id="filePreview" class="hidden flex items-center justify-center space-x-4">
+                        <i id="fileIcon" class="text-4xl"></i>
+                        <span id="selectedFileName" class="text-lg text-gray-700"></span>
+                        <button type="button" id="removeFile" class="ml-2 text-red-600 hover:text-red-800">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
                 </div>
                 <div class="flex justify-between">
                     <button type="button" onclick="cancelUpload()" class="bg-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition">
