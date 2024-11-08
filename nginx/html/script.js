@@ -48,6 +48,7 @@ async function performQuery(query, collection) {
         const queryResultsList = document.getElementById('queryResultsList');
         queryResultsList.innerHTML = results.map(result => `
             <tr class="border-b border-gray-200 hover:bg-gray-100">
+                <td class="py-3 px-6 text-left">${result.chunk_number}</td>
                 <td class="py-3 px-6 text-left">${result.chunk_content.substring(0, 100)}...</td>
                 <td class="py-3 px-6 text-left">${result.distance.toFixed(4)}</td>
                 <td class="py-3 px-6 text-left">${result.document_filename}</td>
