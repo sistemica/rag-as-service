@@ -17,12 +17,24 @@ logger = logging.getLogger(__name__)
 
 @router.post("/query")
 async def query_documents(
-    query: Dict[str, str] = Body(...),
+    query: Dict[str, str | int] = Body(...),
     db: AsyncSession = Depends(get_db)
 ):
     try:
-        query_text = query.get("query").strip().lower()
+        query_text = str(query.get("query", "")).strip().lower()
         collections = query.get("collections", "Default")
+        limit = query.get("limit", settings.DEFAULT_SEARCH_LIMIT)
+        
+        # Validate limit
+        try:
+            limit = int(limit)
+            if limit < settings.MIN_SEARCH_LIMIT or limit > settings.MAX_SEARCH_LIMIT:
+                raise HTTPException(
+                    status_code=400, 
+                    detail=f"Limit must be between {settings.MIN_SEARCH_LIMIT} and {settings.MAX_SEARCH_LIMIT}"
+                )
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Limit must be a number")
         if isinstance(collections, str):
             collections = [c.strip() for c in collections.split(',') if c.strip()]
         if not collections:
@@ -85,13 +97,13 @@ async def query_documents(
         if '-' not in collections:
             vector_matches_query = vector_matches_query.where(Collection.name.in_(collections))
         
-        vector_matches = vector_matches_query.order_by("distance").limit(5)
+        vector_matches = vector_matches_query.order_by("distance").limit(limit)
 
         # Combine results with text matches first, then vector matches
         results = await db.execute(
             union(text_matches, vector_matches)
             .order_by("distance")
-            .limit(5)
+            .limit(limit)
         )
 
         search_results = []

@@ -60,7 +60,7 @@ function toggleChunk(row) {
     }
 }
 
-async function performQuery(query, collections) {
+async function performQuery(query, collections, limit = 10) {
     try {
         const response = await fetch('/api/query', {
             method: 'POST',
@@ -69,7 +69,8 @@ async function performQuery(query, collections) {
             },
             body: JSON.stringify({ 
                 query: query,
-                collections: collections && collections.length ? collections.join(',') : 'Default'
+                collections: collections && collections.length ? collections.join(',') : 'Default',
+                limit: limit
             }),
         });
 

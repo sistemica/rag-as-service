@@ -28,6 +28,9 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = "DEBUG"
     CHUNK_SIZE: int = 1000
     CHUNK_OVERLAP: int = 200
+    DEFAULT_SEARCH_LIMIT: int = 10
+    MIN_SEARCH_LIMIT: int = 5
+    MAX_SEARCH_LIMIT: int = 20
 
     class Config:
         env_file = ".env"
