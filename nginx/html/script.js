@@ -821,7 +821,7 @@ document.addEventListener('DOMContentLoaded', () => {
     queryForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const query = document.getElementById('queryInput').value;
-        const collection = document.getElementById('dropdown-button').textContent.trim();
+        const collection = document.getElementById('dropdown-button').querySelector('span').getAttribute('data-value');
         await performQuery(query, collection);
     });
 
