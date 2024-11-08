@@ -60,7 +60,7 @@ function toggleChunk(row) {
     }
 }
 
-async function performQuery(query, collection) {
+async function performQuery(query, collections) {
     try {
         const response = await fetch('/api/query', {
             method: 'POST',
@@ -69,7 +69,7 @@ async function performQuery(query, collection) {
             },
             body: JSON.stringify({ 
                 query: query,
-                collection: collection || 'Default'
+                collections: collections.length ? collections.join(',') : 'Default'
             }),
         });
 
@@ -870,8 +870,54 @@ document.addEventListener('DOMContentLoaded', () => {
     queryForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const query = document.getElementById('queryInput').value;
-        const collection = document.getElementById('dropdown-button').querySelector('span').getAttribute('data-value');
-        await performQuery(query, collection);
+        const selectedCollections = Array.from(document.querySelectorAll('#queryCollectionSelect button.selected'))
+            .map(btn => btn.getAttribute('data-value'));
+        await performQuery(query, selectedCollections);
+    });
+
+    // Add click handler for collection selection
+    document.querySelectorAll('#queryCollectionSelect button').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (this.getAttribute('data-value') === '-') {
+                // If "All collections" is clicked, deselect others
+                document.querySelectorAll('#queryCollectionSelect button').forEach(b => {
+                    b.classList.remove('selected', 'bg-blue-100');
+                });
+                this.classList.add('selected', 'bg-blue-100');
+            } else {
+                // If specific collection is clicked
+                const allBtn = document.querySelector('#queryCollectionSelect button[data-value="-"]');
+                allBtn.classList.remove('selected', 'bg-blue-100');
+                this.classList.toggle('selected');
+                this.classList.toggle('bg-blue-100');
+            }
+                
+            // Update dropdown button text
+            const selectedButtons = document.querySelectorAll('#queryCollectionSelect button.selected');
+            const dropdownButton = document.getElementById('dropdown-button');
+            if (selectedButtons.length === 0) {
+                // If nothing selected, select "All collections"
+                const allBtn = document.querySelector('#queryCollectionSelect button[data-value="-"]');
+                allBtn.classList.add('selected', 'bg-blue-100');
+                dropdownButton.innerHTML = `
+                    <span class="truncate mr-1.5">All collections</span>
+                    <svg class="w-2.5 h-2.5 flex-shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
+                    </svg>
+                `;
+            } else {
+                const text = Array.from(selectedButtons)
+                    .map(btn => btn.textContent.trim())
+                    .join(', ');
+                dropdownButton.innerHTML = `
+                    <span class="truncate mr-1.5">${text}</span>
+                    <svg class="w-2.5 h-2.5 flex-shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
+                    </svg>
+                `;
+            }
+        });
     });
 
     // Initially show the query section and update counts

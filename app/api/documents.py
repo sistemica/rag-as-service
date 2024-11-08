@@ -22,13 +22,15 @@ async def query_documents(
 ):
     try:
         query_text = query.get("query").strip().lower()
-        collection_name = query.get("collection", "Default")
+        collections = query.get("collections", ["Default"])
+        if isinstance(collections, str):
+            collections = [c.strip() for c in collections.split(',') if c.strip()]
 
         if not query_text:
             raise HTTPException(status_code=400, detail="Query text is required")
 
         # Log the search query for debugging
-        logger.debug(f"Searching for: '{query_text}' in collection: {collection_name if collection_name != '-' else 'all collections'}")
+        logger.debug(f"Searching for: '{query_text}' in collections: {collections}")
 
         # Get the embedding for the query
         query_embedding = await get_embeddings([query_text])
@@ -54,9 +56,9 @@ async def query_documents(
             .join(Collection, Document.collection_id == Collection.id)
         )
 
-        # Add collection filter only if not searching all collections
-        if collection_name != '-':
-            text_matches_query = text_matches_query.where(Collection.name == collection_name)
+        # Add collection filter if specific collections are selected
+        if collections != ['-']:
+            text_matches_query = text_matches_query.where(Collection.name.in_(collections))
         
         # Add content search condition
         text_matches = text_matches_query.where(
@@ -77,9 +79,9 @@ async def query_documents(
             .join(Collection, Document.collection_id == Collection.id)
         )
 
-        # Add collection filter only if not searching all collections
-        if collection_name != '-':
-            vector_matches_query = vector_matches_query.where(Collection.name == collection_name)
+        # Add collection filter if specific collections are selected
+        if collections != ['-']:
+            vector_matches_query = vector_matches_query.where(Collection.name.in_(collections))
         
         vector_matches = vector_matches_query.order_by("distance").limit(5)
 
