@@ -501,11 +501,22 @@ async function fetchCollectionsForDropdown() {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         const collections = await response.json();
+        
+        // Populate the query dropdown
         const queryCollectionSelect = document.getElementById('queryCollectionSelect');
         queryCollectionSelect.innerHTML = '<li><button type="button" class="inline-flex w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white" data-value="-">All collections</button></li>';
         collections.forEach(collection => {
             queryCollectionSelect.innerHTML += `<li><button type="button" class="inline-flex w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white" data-value="${collection}">${collection}</button></li>`;
         });
+
+        // Populate the upload form dropdown
+        const collectionSelect = document.getElementById('collectionSelect');
+        if (collectionSelect) {
+            collectionSelect.innerHTML = '<option value="">Select a collection</option>';
+            collections.forEach(collection => {
+                collectionSelect.innerHTML += `<option value="${collection}">${collection}</option>`;
+            });
+        }
 
         // Add event listeners to the new dropdown items
         const dropdownItems = queryCollectionSelect.querySelectorAll('button');
