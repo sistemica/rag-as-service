@@ -567,9 +567,9 @@ async function fetchCollectionsForDropdown() {
         
         // Populate the query dropdown
         const queryCollectionSelect = document.getElementById('queryCollectionSelect');
-        queryCollectionSelect.innerHTML = '<li><button type="button" class="inline-flex w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white" data-value="-">All collections</button></li>';
+        queryCollectionSelect.innerHTML = '<li><button type="button" class="inline-flex w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white items-center"><input type="checkbox" class="mr-2 collection-checkbox" data-value="-">All collections</button></li>';
         collections.forEach(collection => {
-            queryCollectionSelect.innerHTML += `<li><button type="button" class="inline-flex w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white" data-value="${collection}">${collection}</button></li>`;
+            queryCollectionSelect.innerHTML += `<li><button type="button" class="inline-flex w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white items-center"><input type="checkbox" class="mr-2 collection-checkbox" data-value="${collection}">${collection}</button></li>`;
         });
 
         // Populate the upload form dropdown
@@ -581,18 +581,47 @@ async function fetchCollectionsForDropdown() {
             });
         }
 
-        // Add event listeners to the new dropdown items
-        const dropdownItems = queryCollectionSelect.querySelectorAll('button');
-        dropdownItems.forEach(item => {
-            item.addEventListener('click', function() {
+        // Add event listeners to checkboxes
+        const checkboxes = queryCollectionSelect.querySelectorAll('.collection-checkbox');
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('click', function(e) {
+                e.stopPropagation(); // Prevent button click
+                const allCollectionsCheckbox = document.querySelector('.collection-checkbox[data-value="-"]');
+                
+                if (this.dataset.value === '-') {
+                    // If "All collections" is clicked, uncheck others
+                    checkboxes.forEach(cb => {
+                        if (cb !== this) cb.checked = false;
+                    });
+                } else {
+                    // If specific collection is clicked, uncheck "All collections"
+                    allCollectionsCheckbox.checked = false;
+                }
+                
+                // Update dropdown button text
+                const checkedBoxes = Array.from(checkboxes).filter(cb => cb.checked);
                 const dropdownButton = document.getElementById('dropdown-button');
-                dropdownButton.innerHTML = `
-                    <span class="truncate mr-1.5">${this.textContent}</span>
-                    <svg class="w-2.5 h-2.5 flex-shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
-                    </svg>
-                `;
-                document.getElementById('dropdown').classList.add('hidden');
+                
+                if (checkedBoxes.length === 0) {
+                    // If nothing selected, select "All collections"
+                    allCollectionsCheckbox.checked = true;
+                    dropdownButton.innerHTML = `
+                        <span class="truncate mr-1.5">All collections</span>
+                        <svg class="w-2.5 h-2.5 flex-shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
+                        </svg>
+                    `;
+                } else {
+                    const text = checkedBoxes
+                        .map(cb => cb.parentElement.textContent.trim())
+                        .join(', ');
+                    dropdownButton.innerHTML = `
+                        <span class="truncate mr-1.5">${text}</span>
+                        <svg class="w-2.5 h-2.5 flex-shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
+                        </svg>
+                    `;
+                }
             });
         });
 
@@ -870,13 +899,13 @@ document.addEventListener('DOMContentLoaded', () => {
     queryForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const query = document.getElementById('queryInput').value;
-        const selectedButtons = document.querySelectorAll('#queryCollectionSelect button.selected');
+        const checkedBoxes = document.querySelectorAll('#queryCollectionSelect .collection-checkbox:checked');
         let selectedCollections;
             
-        if (selectedButtons.length === 0 || Array.from(selectedButtons).some(btn => btn.getAttribute('data-value') === '-')) {
+        if (checkedBoxes.length === 0 || Array.from(checkedBoxes).some(cb => cb.getAttribute('data-value') === '-')) {
             selectedCollections = ['-'];
         } else {
-            selectedCollections = Array.from(selectedButtons).map(btn => btn.getAttribute('data-value'));
+            selectedCollections = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-value'));
         }
             
         await performQuery(query, selectedCollections);
