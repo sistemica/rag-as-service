@@ -8,18 +8,18 @@ function showSection(sectionName, documentId = null) {
     document.getElementById(`${sectionName}Section`).classList.remove('hidden');
 
     // Update active menu item
-    document.getElementById('queryLink').classList.remove('bg-gray-700');
-    document.getElementById('collectionsLink').classList.remove('bg-gray-700');
-    document.getElementById('documentsLink').classList.remove('bg-gray-700');
+    document.getElementById('queryLink').classList.remove('bg-blue-100');
+    document.getElementById('collectionsLink').classList.remove('bg-blue-100');
+    document.getElementById('documentsLink').classList.remove('bg-blue-100');
 
     if (sectionName === 'query') {
-        document.getElementById('queryLink').classList.add('bg-gray-700');
+        document.getElementById('queryLink').classList.add('bg-blue-100');
         fetchCollectionsForDropdown();
     } else if (sectionName === 'collections') {
-        document.getElementById('collectionsLink').classList.add('bg-gray-700');
+        document.getElementById('collectionsLink').classList.add('bg-blue-100');
         fetchCollections();
     } else if (sectionName === 'documents') {
-        document.getElementById('documentsLink').classList.add('bg-gray-700');
+        document.getElementById('documentsLink').classList.add('bg-blue-100');
         fetchDocuments();
     } else if (sectionName === 'documentChunks' && documentId) {
         document.getElementById('documentsLink').classList.add('bg-gray-700');
@@ -229,11 +229,9 @@ function cancelUpload() {
 
 async function fetchCollections() {
     try {
-        // Debug log - Check if function is called
         console.log('Fetching collections...');
-
-        // Fetch collections
         const collectionsResponse = await fetch('/api/collections');
+        await updateCounts(); // Update the counts after fetching collections
         console.log('Collections response:', collectionsResponse);
         
         if (!collectionsResponse.ok) {
@@ -337,8 +335,33 @@ async function fetchCollections() {
     }
 }
 
+function showDeleteModal(itemName, deleteCallback) {
+    const modal = document.getElementById('deleteModal');
+    const itemNameSpan = document.getElementById('deleteItemName');
+    const confirmBtn = document.getElementById('confirmDeleteBtn');
+    
+    itemNameSpan.textContent = itemName;
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    
+    // Remove any existing click handlers
+    confirmBtn.replaceWith(confirmBtn.cloneNode(true));
+    
+    // Add new click handler
+    document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
+        await deleteCallback();
+        hideDeleteModal();
+    });
+}
+
+function hideDeleteModal() {
+    const modal = document.getElementById('deleteModal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+}
+
 async function deleteCollection(collectionName) {
-    if (confirm(`Are you sure you want to delete the collection "${collectionName}" and all its documents?`)) {
+    showDeleteModal(`collection "${collectionName}"`, async () => {
         try {
             const response = await fetch(`/api/collections/${encodeURIComponent(collectionName)}`, {
                 method: 'DELETE'
@@ -356,12 +379,32 @@ async function deleteCollection(collectionName) {
             console.error('Error deleting collection:', error);
             showStatus('Error deleting collection. Please try again.', true);
         }
+    });
+}
+
+async function updateCounts() {
+    try {
+        const [documentsResponse, collectionsResponse] = await Promise.all([
+            fetch('/api/documents'),
+            fetch('/api/collections')
+        ]);
+        
+        if (documentsResponse.ok && collectionsResponse.ok) {
+            const documents = await documentsResponse.json();
+            const collections = await collectionsResponse.json();
+            
+            document.getElementById('documentsCount').textContent = documents.length;
+            document.getElementById('collectionsCount').textContent = collections.length;
+        }
+    } catch (error) {
+        console.error('Error updating counts:', error);
     }
 }
 
 async function fetchDocuments() {
     try {
         const response = await fetch('/api/documents');
+        await updateCounts(); // Update the counts after fetching documents
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -385,7 +428,7 @@ async function fetchDocuments() {
                     <td class="py-3 px-6 text-left">${doc.collection_name}</td>
                     <td class="py-3 px-6 text-left">${doc.chunk_count}</td>
                     <td class="py-3 px-6 text-left">
-                        <button onclick="deleteDocument(${doc.id})" class="text-red-600 hover:text-red-800">
+                        <button onclick="deleteDocument(${doc.id}, '${doc.filename}')" class="text-red-600 hover:text-red-800">
                             <i class="fas fa-trash"></i> Delete
                         </button>
                     </td>
@@ -407,8 +450,8 @@ async function fetchDocuments() {
     }
 }
 
-async function deleteDocument(documentId) {
-    if (confirm('Are you sure you want to delete this document?')) {
+async function deleteDocument(documentId, filename) {
+    showDeleteModal(`document "${filename}"`, async () => {
         try {
             const response = await fetch(`/api/documents/${documentId}`, {
                 method: 'DELETE'
@@ -422,7 +465,7 @@ async function deleteDocument(documentId) {
             console.error('Error deleting document:', error);
             showStatus('Error deleting document. Please try again.', true);
         }
-    }
+    });
 }
 
 function searchDocuments() {
@@ -814,6 +857,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('dropArea').classList.remove('hidden');
             uploadSpinner.classList.add('hidden');
             document.querySelector('#uploadForm button[type="submit"]').disabled = false;
+            document.querySelector('#uploadForm button[type="submit"]').classList.remove('hidden');
         }
     });
 
@@ -830,6 +874,7 @@ document.addEventListener('DOMContentLoaded', () => {
         await performQuery(query, collection);
     });
 
-    // Initially show the query section
+    // Initially show the query section and update counts
     showSection('query');
+    updateCounts();
 });
