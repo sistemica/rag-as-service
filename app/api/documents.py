@@ -1,6 +1,6 @@
 from fastapi import APIRouter, UploadFile, File, Header, HTTPException, Depends, Body
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, delete, func
+from sqlalchemy import select, delete, func, Float, union
 from app.db.database import get_db
 from app.services.document_service import DocumentService
 from app.models import Collection, Document, ChunkOllama, ChunkOpenAI, Vector
