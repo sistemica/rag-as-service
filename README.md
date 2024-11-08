@@ -1,6 +1,38 @@
 # RAG-as-Service
 
-A robust Retrieval-Augmented Generation service that processes PDF documents and provides semantic search capabilities. Built with FastAPI, pgvector, and support for multiple embedding providers (Ollama and OpenAI).
+A robust Retrieval-Augmented Generation (RAG) service designed as a building block for LLM-powered applications. This service processes documents and provides semantic search capabilities through vector embeddings, enabling context-aware AI applications.
+
+## 🎯 Purpose
+
+RAG-as-Service serves as a crucial component in modern LLM applications by:
+- Processing and storing documents with semantic understanding
+- Providing fast and accurate context retrieval for LLM prompts
+- Enabling hybrid search combining both semantic similarity and full-text search
+- Managing document collections for organized knowledge bases
+
+Perfect for building:
+- Question-answering systems
+- Document analysis tools
+- Knowledge management systems
+- AI-powered search applications
+
+## 📸 Screenshots
+
+### API Documentation
+![API Documentation](screenshots/api-documentation.png)
+Complete API documentation with interactive Swagger UI
+
+### Collections Management
+![Collections Management](screenshots/collections.png)
+Organize documents into collections for better context management
+
+### Document Management
+![Document Management](screenshots/document-management.png)
+Upload and manage documents with automatic chunking and embedding
+
+### Semantic Search
+![Query Interface](screenshots/query.png)
+Powerful hybrid search combining vector similarity and full-text search
 
 ## 🚀 Features
 
