@@ -1,4 +1,5 @@
 from fastapi import APIRouter, UploadFile, File, Header, HTTPException, Depends, Body
+from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, delete, func, Float, union
 from app.db.database import get_db
@@ -12,6 +13,10 @@ from app.core.config import settings, EmbeddingProvider
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
+
+class TextDocumentUpload(BaseModel):
+    name: str
+    content: str
 
 @router.post("/query")
 async def query_documents(
@@ -142,6 +147,35 @@ async def delete_document(document_id: int, db: AsyncSession = Depends(get_db)):
         return {"message": "Document deleted successfully"}
     except Exception as e:
         logger.error(f"Error deleting document: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+@router.post("/documents/upload/text")
+async def upload_text_document(
+    document: TextDocumentUpload,
+    collection_name: Optional[str] = Header(None, alias="Collection-Name", description="Collection Name"),
+    db: AsyncSession = Depends(get_db)
+):
+    if not collection_name:
+        raise HTTPException(status_code=400, detail="No Collection-Name provided in header")
+
+    try:
+        document_service = DocumentService(db)
+        document_id, chunks_created = await document_service.upload_document(
+            document.content.encode('utf-8'),
+            document.name,
+            collection_name
+        )
+        
+        return {
+            "message": "Document uploaded successfully",
+            "document_id": document_id,
+            "chunks_created": chunks_created
+        }
+        
+    except ValueError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
+    except Exception as e:
+        logger.error(f"Error processing text document: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
 @router.get("/documents/{document_id}/chunks")

@@ -21,7 +21,7 @@ class DocumentService:
         
         try:
             # Process file based on type
-            if file_content.startswith(b'%PDF'):
+            if isinstance(file_content, bytes) and file_content.startswith(b'%PDF'):
                 chunks_with_pages = process_pdf(file_content)
                 if not chunks_with_pages:
                     logger.error("Could not extract text from PDF")
