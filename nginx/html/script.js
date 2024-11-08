@@ -757,10 +757,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            // Hide upload area and show status area
+            // Hide upload area, button and show status area
             document.getElementById('uploadArea').classList.add('hidden');
             document.getElementById('uploadStatus').classList.remove('hidden');
-            document.querySelector('#uploadForm button[type="submit"]').disabled = true;
+            const submitButton = document.querySelector('#uploadForm button[type="submit"]');
+            submitButton.disabled = true;
+            submitButton.classList.add('hidden');
 
             const formData = new FormData();
             formData.append('file', file);
@@ -796,7 +798,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Reset the form view on error
                 document.getElementById('dropArea').classList.remove('hidden');
                 uploadSpinner.classList.add('hidden');
-                document.querySelector('#uploadForm button[type="submit"]').disabled = false;
+                const submitButton = document.querySelector('#uploadForm button[type="submit"]');
+                submitButton.disabled = false;
+                submitButton.classList.remove('hidden');
             }
         } catch (error) {
             console.error('Error:', error);
