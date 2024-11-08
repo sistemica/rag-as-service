@@ -848,6 +848,7 @@ document.addEventListener('DOMContentLoaded', () => {
         await performQuery(query, collection);
     });
 
-    // Initially show the query section
+    // Initially show the query section and update counts
     showSection('query');
+    updateCounts();
 });
