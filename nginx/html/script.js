@@ -406,7 +406,7 @@ async function fetchCollectionsForQueryDropdown() {
     }
 }
 
-// Fetch collections and populate the dropdown
+// Fetch collections and populate the dropdown for search
 async function fetchCollectionsForDropdown() {
     try {
         console.log("fetchCollectionsForDropdown");
