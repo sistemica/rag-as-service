@@ -335,8 +335,33 @@ async function fetchCollections() {
     }
 }
 
+function showDeleteModal(itemName, deleteCallback) {
+    const modal = document.getElementById('deleteModal');
+    const itemNameSpan = document.getElementById('deleteItemName');
+    const confirmBtn = document.getElementById('confirmDeleteBtn');
+    
+    itemNameSpan.textContent = itemName;
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    
+    // Remove any existing click handlers
+    confirmBtn.replaceWith(confirmBtn.cloneNode(true));
+    
+    // Add new click handler
+    document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
+        await deleteCallback();
+        hideDeleteModal();
+    });
+}
+
+function hideDeleteModal() {
+    const modal = document.getElementById('deleteModal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+}
+
 async function deleteCollection(collectionName) {
-    if (confirm(`Are you sure you want to delete the collection "${collectionName}" and all its documents?`)) {
+    showDeleteModal(`collection "${collectionName}"`, async () => {
         try {
             const response = await fetch(`/api/collections/${encodeURIComponent(collectionName)}`, {
                 method: 'DELETE'
@@ -403,7 +428,7 @@ async function fetchDocuments() {
                     <td class="py-3 px-6 text-left">${doc.collection_name}</td>
                     <td class="py-3 px-6 text-left">${doc.chunk_count}</td>
                     <td class="py-3 px-6 text-left">
-                        <button onclick="deleteDocument(${doc.id})" class="text-red-600 hover:text-red-800">
+                        <button onclick="deleteDocument(${doc.id}, '${doc.filename}')" class="text-red-600 hover:text-red-800">
                             <i class="fas fa-trash"></i> Delete
                         </button>
                     </td>
@@ -425,8 +450,8 @@ async function fetchDocuments() {
     }
 }
 
-async function deleteDocument(documentId) {
-    if (confirm('Are you sure you want to delete this document?')) {
+async function deleteDocument(documentId, filename) {
+    showDeleteModal(`document "${filename}"`, async () => {
         try {
             const response = await fetch(`/api/documents/${documentId}`, {
                 method: 'DELETE'
