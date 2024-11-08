@@ -52,7 +52,7 @@ async def query_documents(
         
         # Add content search condition
         text_matches = text_matches_query.where(
-            func.lower(chunk_table.content).contains(func.lower(query_text))
+            func.lower(chunk_table.content).op('~*')(f'\\y{query_text}\\y')
         )
 
         # Then get vector similarity matches
