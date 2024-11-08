@@ -229,11 +229,9 @@ function cancelUpload() {
 
 async function fetchCollections() {
     try {
-        // Debug log - Check if function is called
         console.log('Fetching collections...');
-
-        // Fetch collections
         const collectionsResponse = await fetch('/api/collections');
+        await updateCounts(); // Update the counts after fetching collections
         console.log('Collections response:', collectionsResponse);
         
         if (!collectionsResponse.ok) {
@@ -359,9 +357,29 @@ async function deleteCollection(collectionName) {
     }
 }
 
+async function updateCounts() {
+    try {
+        const [documentsResponse, collectionsResponse] = await Promise.all([
+            fetch('/api/documents'),
+            fetch('/api/collections')
+        ]);
+        
+        if (documentsResponse.ok && collectionsResponse.ok) {
+            const documents = await documentsResponse.json();
+            const collections = await collectionsResponse.json();
+            
+            document.getElementById('documentsCount').textContent = documents.length;
+            document.getElementById('collectionsCount').textContent = collections.length;
+        }
+    } catch (error) {
+        console.error('Error updating counts:', error);
+    }
+}
+
 async function fetchDocuments() {
     try {
         const response = await fetch('/api/documents');
+        await updateCounts(); // Update the counts after fetching documents
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
