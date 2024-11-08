@@ -30,6 +30,19 @@ function showSection(sectionName, documentId = null) {
 
 
 
+function toggleChunk(row) {
+    const preview = row.querySelector('.chunk-preview');
+    const full = row.querySelector('.chunk-full');
+    
+    if (full.classList.contains('hidden')) {
+        preview.classList.add('hidden');
+        full.classList.remove('hidden');
+    } else {
+        preview.classList.remove('hidden');
+        full.classList.add('hidden');
+    }
+}
+
 async function performQuery(query, collection) {
     try {
         const response = await fetch('/api/query', {
@@ -47,9 +60,12 @@ async function performQuery(query, collection) {
         const results = await response.json();
         const queryResultsList = document.getElementById('queryResultsList');
         queryResultsList.innerHTML = results.map(result => `
-            <tr class="border-b border-gray-200 hover:bg-gray-100">
+            <tr class="border-b border-gray-200 hover:bg-gray-100 cursor-pointer" onclick="toggleChunk(this)">
                 <td class="py-3 px-6 text-left">${result.chunk_number}</td>
-                <td class="py-3 px-6 text-left">${result.chunk_content.substring(0, 100)}...</td>
+                <td class="py-3 px-6 text-left">
+                    <div class="chunk-preview">${result.chunk_content.substring(0, 100)}...</div>
+                    <div class="chunk-full hidden">${result.chunk_content}</div>
+                </td>
                 <td class="py-3 px-6 text-left">${result.distance.toFixed(4)}</td>
                 <td class="py-3 px-6 text-left">${result.document_filename}</td>
             </tr>
