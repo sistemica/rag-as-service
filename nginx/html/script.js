@@ -8,18 +8,18 @@ function showSection(sectionName, documentId = null) {
     document.getElementById(`${sectionName}Section`).classList.remove('hidden');
 
     // Update active menu item
-    document.getElementById('queryLink').classList.remove('bg-gray-700');
-    document.getElementById('collectionsLink').classList.remove('bg-gray-700');
-    document.getElementById('documentsLink').classList.remove('bg-gray-700');
+    document.getElementById('queryLink').classList.remove('bg-blue-100');
+    document.getElementById('collectionsLink').classList.remove('bg-blue-100');
+    document.getElementById('documentsLink').classList.remove('bg-blue-100');
 
     if (sectionName === 'query') {
-        document.getElementById('queryLink').classList.add('bg-gray-700');
+        document.getElementById('queryLink').classList.add('bg-blue-100');
         fetchCollectionsForDropdown();
     } else if (sectionName === 'collections') {
-        document.getElementById('collectionsLink').classList.add('bg-gray-700');
+        document.getElementById('collectionsLink').classList.add('bg-blue-100');
         fetchCollections();
     } else if (sectionName === 'documents') {
-        document.getElementById('documentsLink').classList.add('bg-gray-700');
+        document.getElementById('documentsLink').classList.add('bg-blue-100');
         fetchDocuments();
     } else if (sectionName === 'documentChunks' && documentId) {
         document.getElementById('documentsLink').classList.add('bg-gray-700');
