@@ -31,16 +31,32 @@ function showSection(sectionName, documentId = null) {
 
 
 function toggleChunk(row) {
-    const preview = row.querySelector('.chunk-preview');
-    const full = row.querySelector('.chunk-full');
-    
-    if (full.classList.contains('hidden')) {
-        preview.classList.add('hidden');
-        full.classList.remove('hidden');
-    } else {
-        preview.classList.remove('hidden');
-        full.classList.add('hidden');
+    // Check if there's already an expanded row
+    const existingExpanded = document.querySelector('.expanded-chunk');
+    if (existingExpanded) {
+        existingExpanded.remove();
     }
+
+    // If we clicked on the same row that was expanded, just remove it and return
+    if (existingExpanded && existingExpanded.previousElementSibling === row) {
+        return;
+    }
+
+    // Create new row for full content
+    const expandedRow = document.createElement('tr');
+    expandedRow.className = 'expanded-chunk bg-gray-50';
+    const fullContent = row.querySelector('.chunk-full').textContent;
+    
+    expandedRow.innerHTML = `
+        <td colspan="4" class="py-4 px-6">
+            <div class="whitespace-pre-wrap bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                ${fullContent}
+            </div>
+        </td>
+    `;
+
+    // Insert after the clicked row
+    row.parentNode.insertBefore(expandedRow, row.nextSibling);
 }
 
 async function performQuery(query, collection) {
