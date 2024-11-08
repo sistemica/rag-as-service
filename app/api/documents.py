@@ -48,11 +48,7 @@ async def query_documents(
             )
             .join(Document)
             .join(Collection)
-            .where(
-                Collection.name == collection_name,
-                (func.lower(chunk_table.content).contains(func.lower(query_text)) |
-                 (func.l2_distance(chunk_table.content_vector, func.cast(query_embedding, Vector)) < 1.0))
-            )
+            .where(Collection.name == collection_name)
             .order_by("distance")
             .limit(5)
         )
