@@ -4,7 +4,8 @@ A robust Retrieval-Augmented Generation service that processes PDF documents and
 
 ## 🚀 Features
 
-- **PDF Processing**: Upload and process PDF documents with automatic chunking
+- **Document Processing**: Upload and process PDF, TXT, and MD files with automatic chunking
+- **Text Content Upload**: Direct text content upload via API endpoint
 - **Multiple Embedding Providers**: Support for both Ollama and OpenAI embeddings
 - **Vector Search**: Efficient semantic search using pgvector
 - **Multi-User Support**: Built-in user isolation for document management
@@ -169,7 +170,7 @@ make lint
 ## 📚 API Documentation
 
 After starting the service, visit:
-- Swagger UI: http://localhost:8000/docs
+- Swagger UI: Available both at http://localhost:8000/docs and embedded in the web interface
 - ReDoc: http://localhost:8000/redoc
 
 ### Key Endpoints
@@ -177,9 +178,18 @@ After starting the service, visit:
 #### Upload Document
 ```http
 POST /documents/upload
-Header: user_id: 
+Header: Collection-Name: <collection_name>
 Body: form-data
-  - file: PDF file
+  - file: PDF, TXT, or MD file
+
+# Or for text content:
+POST /documents/upload/text
+Header: Collection-Name: <collection_name>
+Body: JSON
+{
+    "name": "document_name.txt",
+    "content": "Your text content here"
+}
 ```
 
 #### Search Documents
